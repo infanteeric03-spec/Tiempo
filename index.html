@@ -4,6 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Tiempo</title>
+<meta name="description" content="Previsión del tiempo por horas y a 7 días, con tu ciudad predeterminada.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="icon" href="icons/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="theme-color" content="#eef3f4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0c1a1f" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tiempo">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -28,7 +39,7 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 var(--font-body);padding-inline:16px;padding-block:16px 40px;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 var(--font-body);padding-inline:16px;padding-block:calc(16px + env(safe-area-inset-top,0px)) calc(40px + env(safe-area-inset-bottom,0px));-webkit-text-size-adjust:100%}
 main{max-width:640px;margin-inline:auto;display:flex;flex-direction:column;gap:16px}
 h1,h2{font-family:var(--font-display);margin:0;font-weight:700;text-wrap:balance}
 .num{font-variant-numeric:tabular-nums}
@@ -94,6 +105,7 @@ section.box h2{font-size:1.05rem;padding-inline:16px;margin-bottom:10px}
 .day-detail .hours{padding-inline:0}
 .det-sum{margin:0 0 6px;color:var(--muted);font-size:.85rem}
 .hint{margin:-6px 0 6px;padding-inline:16px;color:var(--muted);font-size:.85rem}
+.offline{margin:0 0 16px;padding:10px 14px;border-radius:12px;background:var(--surface-2);color:var(--muted);font-size:.9rem;text-align:center}
 .foot{color:var(--muted);font-size:.8rem;text-align:center}
 .foot a{color:inherit}
 .loading{color:var(--muted);text-align:center;padding:40px 0}
@@ -180,6 +192,19 @@ function placeLine(c){ return [c.admin1, c.country].filter(Boolean).join(", "); 
 function esc(s){ const d=document.createElement("div"); d.textContent=s==null?"":String(s); return d.innerHTML; }
 function dayName(iso,i){ if(i===0) return "Hoy"; return new Date(iso+"T12:00:00").toLocaleDateString("es-ES",{weekday:"short"}).replace(".",""); }
 
+/* ---------- Última previsión guardada (para abrir sin conexión) ---------- */
+const FKEY = "tiempo.ultima";
+function saveForecast(c, data){
+  try{ localStorage.setItem(FKEY, JSON.stringify({lat:c.latitude, lon:c.longitude, ts:Date.now(), data})); }catch(e){}
+}
+function readForecast(c){
+  try{
+    const o = JSON.parse(localStorage.getItem(FKEY));
+    if(o && Math.abs(o.lat-c.latitude)<0.01 && Math.abs(o.lon-c.longitude)<0.01 && o.data) return o;
+  }catch(e){}
+  return null;
+}
+
 /* ---------- Previsión ---------- */
 async function loadForecast(c){
   current = c;
@@ -192,8 +217,18 @@ async function loadForecast(c){
   try{
     const res = await fetch(url);
     if(!res.ok) throw new Error("HTTP "+res.status);
-    render(c, await res.json());
+    const data = await res.json();
+    saveForecast(c, data);
+    render(c, data);
   }catch(e){
+    const old = readForecast(c);
+    if(old){
+      render(c, old.data);
+      const mins = Math.max(1, Math.round((Date.now()-old.ts)/60000));
+      const ago = mins < 60 ? mins+" min" : mins < 1440 ? Math.round(mins/60)+" h" : Math.round(mins/1440)+" d";
+      app.insertAdjacentHTML("afterbegin", '<p class="offline" role="status">Sin conexión. Datos guardados hace '+ago+'.</p>');
+      return;
+    }
     app.innerHTML = '<div class="hero"><h2>No se pudo cargar la previsión</h2><p class="feels">Comprueba tu conexión e inténtalo de nuevo.</p><div><button class="btn primary" id="retry" type="button">Reintentar</button></div></div>';
     $("retry").onclick = () => loadForecast(c);
   }
@@ -313,6 +348,11 @@ document.addEventListener("click", e => { if(!e.target.closest(".search")) hideR
 document.addEventListener("keydown", e => { if(e.key==="Escape") hideResults(); });
 
 loadForecast(defaultCity);
+
+/* ---------- App instalable: service worker ---------- */
+if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
+  window.addEventListener("load", () => { navigator.serviceWorker.register("sw.js").catch(()=>{}); });
+}
 </script>
 </body>
 </html>
