@@ -52,6 +52,13 @@ h1,h2{font-family:var(--font-display);margin:0;font-weight:700;text-wrap:balance
 .search input:focus-visible,button:focus-visible,.result:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .btn{font:inherit;font-weight:600;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:12px;padding:12px 14px}
 .btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.btn.loc{display:grid;place-items:center;padding:0 12px}
+.btn.loc svg{width:22px;height:22px}
+.btn.loc:disabled{opacity:.6;cursor:progress}
+.opts{display:flex;flex-direction:column;gap:6px;margin-top:-6px}
+.opts label{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.9rem;cursor:pointer}
+.opts input{width:18px;height:18px;accent-color:var(--accent);margin:0}
+.note{margin:0;font-size:.85rem;color:var(--muted)}
 .results{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:5;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.18)}
 .result{display:block;width:100%;text-align:left;font:inherit;color:var(--fg);background:none;border:0;border-bottom:1px solid var(--line);padding:11px 14px;cursor:pointer}
 .result:last-child{border-bottom:0}
@@ -123,8 +130,13 @@ section.box h2{font-size:1.05rem;padding-inline:16px;margin-bottom:10px}
     <form id="form" role="search" autocomplete="off">
       <input id="q" type="search" placeholder="Buscar ciudad…" aria-label="Buscar ciudad" autocomplete="off" enterkeyhint="search">
       <button class="btn primary" type="submit">Buscar</button>
+      <button class="btn loc" id="loc" type="button" aria-label="Usar mi ubicación" title="Usar mi ubicación"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="currentColor"/><circle cx="12" cy="12" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
     </form>
     <div id="results" class="results" hidden role="listbox"></div>
+  </div>
+  <div class="opts">
+    <label><input type="checkbox" id="auto"> Abrir siempre con mi ubicación</label>
+    <p id="note" class="note" role="status" hidden></p>
   </div>
   <div id="app"><p class="loading">Cargando previsión…</p></div>
   <p class="foot">Datos de <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></p>
@@ -332,7 +344,7 @@ async function search(term){
     resultsEl.hidden = false; resultsEl.innerHTML = '<div class="msg">No se pudo buscar. Revisa tu conexión.</div>';
   }
 }
-function pick(c){ hideResults(); q.value = ""; q.blur(); loadForecast(c); window.scrollTo({top:0}); }
+function pick(c){ userPicked = true; hideResults(); q.value = ""; q.blur(); showNote(""); loadForecast(c); window.scrollTo({top:0}); }
 q.addEventListener("input", () => {
   clearTimeout(timer); const v = q.value.trim();
   if(v.length < 2){ searchSeq++; hideResults(); return; }
@@ -347,7 +359,58 @@ resultsEl.addEventListener("click", e => { const b = e.target.closest(".result")
 document.addEventListener("click", e => { if(!e.target.closest(".search")) hideResults(); });
 document.addEventListener("keydown", e => { if(e.key==="Escape") hideResults(); });
 
+/* ---------- Mi ubicación ---------- */
+const MKEY = "tiempo.modo";
+const locBtn = $("loc"), autoBox = $("auto"), noteEl = $("note");
+let userPicked = false;
+function getMode(){ try{ return localStorage.getItem(MKEY) || "fija"; }catch(e){ return "fija"; } }
+function setMode(m){ try{ localStorage.setItem(MKEY, m); }catch(e){} }
+function showNote(t){ noteEl.textContent = t; noteEl.hidden = !t; }
+
+async function reverseName(lat, lon){
+  try{
+    const res = await fetch("https://api.bigdatacloud.net/data/reverse-geocode-client?latitude="+lat+"&longitude="+lon+"&localityLanguage=es");
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    const d = await res.json();
+    const name = d.city || d.locality || d.principalSubdivision || "Mi ubicación";
+    const admin = d.principalSubdivision && d.principalSubdivision !== name ? d.principalSubdivision : "";
+    return {name, admin1:admin, country:d.countryName || ""};
+  }catch(e){
+    return {name:"Mi ubicación", admin1:"", country:""};
+  }
+}
+
+function locate(auto){
+  if(!("geolocation" in navigator)){ if(!auto) showNote("Este navegador no permite obtener la ubicación."); return; }
+  locBtn.disabled = true;
+  if(!auto) showNote("Buscando tu ubicación…");
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const lat = +pos.coords.latitude.toFixed(4), lon = +pos.coords.longitude.toFixed(4);
+    const place = await reverseName(lat, lon);
+    locBtn.disabled = false;
+    if(auto && userPicked){ showNote(""); return; }   // si ya elegiste otra ciudad, no se la quitamos
+    showNote("");
+    hideResults();
+    loadForecast({name:place.name, admin1:place.admin1, country:place.country, latitude:lat, longitude:lon});
+  }, err => {
+    locBtn.disabled = false;
+    if(auto){ showNote(""); return; }
+    showNote(err.code === 1
+      ? "No hay permiso de ubicación. Actívalo en los ajustes del navegador para este sitio."
+      : err.code === 3 ? "Tardó demasiado en obtener la ubicación. Inténtalo de nuevo."
+      : "No se pudo obtener tu ubicación.");
+  }, {enableHighAccuracy:false, timeout:10000, maximumAge:600000});
+}
+
+locBtn.addEventListener("click", () => { userPicked = true; locate(false); });
+autoBox.checked = getMode() === "gps";
+autoBox.addEventListener("change", () => {
+  setMode(autoBox.checked ? "gps" : "fija");
+  if(autoBox.checked){ userPicked = true; locate(false); } else showNote("");
+});
+
 loadForecast(defaultCity);
+if(getMode() === "gps") locate(true);
 
 /* ---------- App instalable: service worker ---------- */
 if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
