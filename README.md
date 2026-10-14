@@ -10,6 +10,7 @@ Web app de previsión del tiempo en un solo archivo (`index.html`), sin dependen
 - Tiempo actual: temperatura, sensación térmica, viento, humedad, lluvia, UV, amanecer y atardecer.
 - Previsión de las próximas 24 horas. Al tocar una hora se abre su detalle: sensación térmica, lluvia en mm, viento con rachas, humedad, nubosidad, índice UV y un resumen en una frase. En "Más detalles": presión, visibilidad, punto de rocío y nieve.
 - Previsión de 7 días. Al tocar un día se despliega su previsión hora a hora.
+- Pestaña **Playas con niños**: ordena 13 playas de Asturias por comodidad en la arena (de 0 a 100) según viento, rachas y oleaje en el día y la franja elegidos (mañana 10–14 h o tarde 15–20 h). Avisa del viento de tierra por el riesgo para flotadores y colchonetas. Se puede abrir directamente con `#playas`, y la app instalada tiene un acceso directo.
 - Diseño adaptado al móvil, con modo claro y oscuro automático.
 
 ## Datos
@@ -42,3 +43,7 @@ Debe abrirse desde la dirección de GitHub Pages (HTTPS); abierta como archivo l
 - `icons/`: icono (SVG y PNG, con versión *maskable* para Android).
 
 La ciudad predeterminada se guarda en cada dispositivo por separado.
+
+## Playas: datos y límites
+
+La lista está al principio del bloque «Playas de Asturias con niños» de `index.html` (`BEACHES`). Cada playa tiene posición aproximada, orientación y un nivel de abrigo (`alto`, `medio`, `bajo`) tomado de las descripciones de Turismo Asturias y asturias.com. La orientación se supone norte para todas. Los modelos meteorológicos tienen celdas de varios kilómetros, así que lo que distingue a una playa de otra es sobre todo su abrigo, no una medición local. No incluye mareas.

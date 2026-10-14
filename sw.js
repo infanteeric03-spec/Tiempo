@@ -1,5 +1,5 @@
 /* Service worker de Tiempo: la app abre sin conexión; los datos del tiempo siempre van a la red. */
-const VERSION = "tiempo-v3";
+const VERSION = "tiempo-v4";
 const SHELL = [
   "./",
   "index.html",

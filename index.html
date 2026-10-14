@@ -22,20 +22,20 @@
 /* Layout: una sola columna estrecha. Cabecera con buscador, ciudad actual, horas en tira, 7 días en lista. */
 :root{
   --bg:#eef3f4; --surface:#ffffff; --surface-2:#e3ebed; --fg:#14272d; --muted:#5a7078;
-  --line:#d3dfe2; --accent:#0e7490; --accent-fg:#ffffff; --sun:#e8a317; --cloud:#8aa1aa; --rain:#2f7fb8; --bar:#9bc7d6;
+  --line:#d3dfe2; --accent:#0e7490; --accent-fg:#ffffff; --sun:#e8a317; --cloud:#8aa1aa; --rain:#2f7fb8; --bar:#9bc7d6; --good:#1a7f5a; --warn:#b7791f; --bad:#c2410c;
   --font-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
   --font-body:"DM Sans","Segoe UI",system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     --bg:#0c1a1f; --surface:#132a31; --surface-2:#1a363f; --fg:#e6f0f2; --muted:#8fa9b1;
-    --line:#244650; --accent:#5ec4de; --accent-fg:#0c1a1f; --sun:#f2b73a; --cloud:#7f98a1; --rain:#6fb4e6; --bar:#3c7f93;
+    --line:#244650; --accent:#5ec4de; --accent-fg:#0c1a1f; --sun:#f2b73a; --cloud:#7f98a1; --rain:#6fb4e6; --bar:#3c7f93; --good:#4cc9a0; --warn:#f2b73a; --bad:#f08a5d;
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
   --bg:#0c1a1f; --surface:#132a31; --surface-2:#1a363f; --fg:#e6f0f2; --muted:#8fa9b1;
-  --line:#244650; --accent:#5ec4de; --accent-fg:#0c1a1f; --sun:#f2b73a; --cloud:#7f98a1; --rain:#6fb4e6; --bar:#3c7f93;
+  --line:#244650; --accent:#5ec4de; --accent-fg:#0c1a1f; --sun:#f2b73a; --cloud:#7f98a1; --rain:#6fb4e6; --bar:#3c7f93; --good:#4cc9a0; --warn:#f2b73a; --bad:#f08a5d;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -83,6 +83,44 @@ h1,h2{font-family:var(--font-display);margin:0;font-weight:700;text-wrap:balance
 .stat{background:var(--surface);padding:12px 14px;min-width:0}
 .stat span{display:block;color:var(--muted);font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
 .stat b{font-size:1.1rem;font-weight:600}
+
+/* Pestañas y vista de playas */
+.view{display:flex;flex-direction:column;gap:16px}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;background:var(--surface-2);border-radius:14px}
+.tabbtn{font:inherit;font-weight:600;color:var(--muted);background:none;border:0;border-radius:10px;padding:10px 8px;cursor:pointer}
+.tabbtn[aria-current="page"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.tabbtn:focus-visible,.chip:focus-visible,.bh:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.chip{flex:none;font:inherit;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.pctl{display:flex;flex-direction:column;gap:10px}
+.verdict{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.verdict h2{font-size:1.15rem}
+.verdict p{margin:0;color:var(--muted)}
+.blist{list-style:none;margin:0;padding:0 16px}
+.bch{border-top:1px solid var(--line)}
+.bch:first-child{border-top:0}
+.bh{width:100%;display:grid;grid-template-columns:1.8rem minmax(0,1fr) auto;column-gap:10px;row-gap:6px;align-items:center;padding:12px 0;font:inherit;color:inherit;text-align:left;background:none;border:0;cursor:pointer}
+.rk{font-family:var(--font-display);font-weight:700;font-size:1.1rem;color:var(--muted);text-align:center}
+.bn{min-width:0}
+.bn b{display:block}
+.bn small{color:var(--muted)}
+.bs{text-align:right}
+.bs b{font-family:var(--font-display);font-size:1.5rem;line-height:1}
+.bs small{display:block;font-size:.78rem;color:var(--muted)}
+.bbar{grid-column:2 / 4;display:block;height:6px;border-radius:3px;background:var(--surface-2)}
+.bbar i{display:block;height:100%;border-radius:3px}
+.bline{grid-column:2 / 4;font-size:.85rem;color:var(--muted)}
+.btags{grid-column:2 / 4;display:flex;flex-wrap:wrap;gap:6px}
+.tag{font-size:.75rem;padding:3px 8px;border-radius:999px;background:var(--surface-2);color:var(--fg)}
+.tag.alert{background:none;border:1px solid var(--bad);font-weight:600}
+.bd{padding:0 0 12px 2.3rem;display:flex;flex-direction:column;gap:10px}
+.bd p{margin:0}
+.bnote{color:var(--muted)}
+.pfoot{padding:0 16px;display:flex;flex-direction:column;gap:8px;color:var(--muted);font-size:.85rem}
+.pfoot p{margin:0}
+.pfoot a{color:inherit}
+.pfoot .more summary{padding-bottom:6px}
 
 /* Secciones */
 section.box{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px 0 12px}
@@ -141,6 +179,11 @@ section.box h2{font-size:1.05rem;padding-inline:16px;margin-bottom:10px}
 </head>
 <body>
 <main>
+  <nav class="tabs" aria-label="Secciones">
+    <button class="tabbtn" id="tab-tiempo" type="button" aria-current="page">Tiempo</button>
+    <button class="tabbtn" id="tab-playas" type="button">Playas con niños</button>
+  </nav>
+  <div id="view-tiempo" class="view">
   <div class="search">
     <form id="form" role="search" autocomplete="off">
       <input id="q" type="search" placeholder="Buscar ciudad…" aria-label="Buscar ciudad" autocomplete="off" enterkeyhint="search">
@@ -154,6 +197,8 @@ section.box h2{font-size:1.05rem;padding-inline:16px;margin-bottom:10px}
     <p id="note" class="note" role="status" hidden></p>
   </div>
   <div id="app"><p class="loading">Cargando previsión…</p></div>
+  </div>
+  <div id="view-playas" class="view" hidden></div>
   <p class="foot">Datos de <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></p>
 </main>
 
@@ -475,8 +520,248 @@ autoBox.addEventListener("change", () => {
   if(autoBox.checked){ userPicked = true; locate(false); } else showNote("");
 });
 
+/* ---------- Playas de Asturias con niños ---------- */
+/* Datos editables de cada playa.
+   lat/lon: posición aproximada (los modelos de viento tienen celdas de varios km, no hace falta más precisión).
+   face: hacia dónde mira la playa, en grados (0 = norte, 90 = este). Toda la costa asturiana mira al norte
+         más o menos; se puede afinar por playa si se confirma su orientación.
+   abrigo: "alto" | "medio" | "bajo", según lo que cuentan las guías de turismo de Asturias sobre cada playa. */
+const BEACHES = [
+  {id:"penarronda", name:"Peñarronda", town:"Castropol", zone:"Occidente", lat:43.563, lon:-6.995, face:0, abrigo:"bajo",
+   note:"Espacio muy abierto y a veces ventoso. Arena fina; mejor para jugar en la arena que para bañarse."},
+  {id:"serantes", name:"Serantes", town:"Tapia de Casariego", zone:"Occidente", lat:43.561, lon:-6.976, face:0, abrigo:"bajo",
+   note:"Arena fina, algo ventosa y con oleaje moderado. Junto a dunas y marismas."},
+  {id:"frejulfe", name:"Frejulfe", town:"Navia", zone:"Occidente", lat:43.565, lon:-6.665, face:0, abrigo:"bajo",
+   note:"Playa abierta, a veces con oleaje fuerte. Los más pequeños pueden chapotear en el río, en el extremo este."},
+  {id:"banugues", name:"Bañugues", town:"Gozón", zone:"Centro", lat:43.609, lon:-5.820, face:0, abrigo:"alto",
+   note:"Ensenada apacible con muy poco oleaje. Poco fondo y charcas naturales en bajamar."},
+  {id:"sanlorenzo", name:"San Lorenzo", town:"Gijón", zone:"Centro", lat:43.545, lon:-5.660, face:0, abrigo:"medio",
+   note:"Playa urbana, muy larga y con todos los servicios. Mira al norte, algo resguardada por Cimadevilla."},
+  {id:"poniente", name:"Poniente", town:"Gijón", zone:"Centro", lat:43.543, lon:-5.683, face:0, abrigo:"medio",
+   note:"Playa artificial de unos 500 m con dique al este. Tiene mucha más arena en bajamar que en pleamar."},
+  {id:"rodiles", name:"Rodiles", town:"Villaviciosa", zone:"Centro", lat:43.527, lon:-5.385, face:0, abrigo:"bajo",
+   note:"La playa abierta tiene olas. Para bañarse con calma, mejor la zona de la ría (Misiego y la «playita de Miami»)."},
+  {id:"lagriega", name:"La Griega", town:"Colunga", zone:"Centro", lat:43.499, lon:-5.268, face:0, abrigo:"medio",
+   note:"Poca agua en la orilla y charcas en bajamar. Un río desemboca en la propia playa."},
+  {id:"santamarina", name:"Santa Marina", town:"Ribadesella", zone:"Oriente", lat:43.468, lon:-5.057, face:0, abrigo:"medio",
+   note:"Playa urbana con todos los servicios. Con mar picada hay una zona de baño en el extremo este."},
+  {id:"guadamia", name:"Guadamía", town:"Llanes", zone:"Oriente", lat:43.447, lon:-4.937, face:0, abrigo:"alto",
+   note:"Un canal estrecho entre acantilados la protege del mar. Banco de arena largo en bajamar."},
+  {id:"barro", name:"Barro", town:"Llanes", zone:"Oriente", lat:43.445, lon:-4.815, face:0, abrigo:"alto",
+   note:"Bahía en herradura protegida por islotes, al abrigo del viento y del mar abierto."},
+  {id:"poo", name:"Poo", town:"Llanes", zone:"Oriente", lat:43.431, lon:-4.779, face:0, abrigo:"alto",
+   note:"Ensenada de aguas muy tranquilas; en pleamar parece una piscina de agua salada. Arena fina y sin desniveles bruscos."},
+  {id:"lafranca", name:"La Franca", town:"Ribadedeva", zone:"Oriente", lat:43.398, lon:-4.535, face:0, abrigo:"medio",
+   note:"En la desembocadura del río Cabra. En pleamar queda una piscina somera; oleaje moderado."}
+];
+const SHELTER = {
+  alto:  {wind:0.55, wave:0.5, text:"Abrigada"},
+  medio: {wind:0.8,  wave:0.8, text:"Semiabrigada"},
+  bajo:  {wind:1,    wave:1,   text:"Abierta"}
+};
+const SLOTS = {
+  manana:{label:"Mañana", from:10, to:14, text:"10–14 h"},
+  tarde: {label:"Tarde",  from:15, to:20, text:"15–20 h"}
+};
+const PKEY = "tiempo.playas";
+const pv = $("view-playas");
+let pb = {data:null, day:0, slot:"tarde", open:null, started:false, stale:null};
+
+const mean = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : null;
+const angDiff = (a,b) => Math.abs(((a-b+540)%360)-180);
+function vecDir(pairs){            // dirección media del viento, ponderada por velocidad
+  let x=0, y=0;
+  pairs.forEach(([s,d]) => { const a=d*Math.PI/180; x+=s*Math.sin(a); y+=s*Math.cos(a); });
+  return (Math.atan2(x,y)*180/Math.PI+360)%360;
+}
+function scoreLabel(s){ return s>=80 ? "Muy cómoda" : s>=65 ? "Cómoda" : s>=50 ? "Regular" : s>=35 ? "Incómoda" : "Muy incómoda"; }
+function scoreColor(s){ return s>=65 ? "var(--good)" : s>=40 ? "var(--warn)" : "var(--bad)"; }
+const KIND = {mar:"Viento del mar", lateral:"Viento lateral", tierra:"Viento de tierra"};
+
+function initBeaches(){
+  if(pb.started) return;
+  pb.started = true;
+  pv.innerHTML = '<p class="loading">Cargando playas…</p>';
+  loadBeaches();
+}
+async function getJson(url){
+  const res = await fetch(url);
+  if(!res.ok) throw new Error("HTTP "+res.status);
+  return res.json();
+}
+async function loadBeaches(){
+  const lat = BEACHES.map(b => b.lat).join(","), lon = BEACHES.map(b => b.lon).join(",");
+  const tz = "&timezone=Europe%2FMadrid&forecast_days=7";
+  const [f, m] = await Promise.allSettled([
+    getJson("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&hourly=temperature_2m,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index"+tz),
+    getJson("https://marine-api.open-meteo.com/v1/marine?latitude="+lat+"&longitude="+lon+"&hourly=wave_height"+tz)
+  ]);
+  pb.data = null; pb.stale = null;
+  try{
+    if(f.status !== "fulfilled") throw new Error("sin previsión");
+    const F = [].concat(f.value);   // un solo punto devuelve un objeto; varios, una lista
+    if(F.length !== BEACHES.length) throw new Error("respuesta incompleta");
+    let M = null;
+    if(m.status === "fulfilled"){ M = [].concat(m.value); if(M.length !== BEACHES.length) M = null; }
+    pb.data = {F, M, ts:Date.now()};
+    try{ localStorage.setItem(PKEY, JSON.stringify(pb.data)); }catch(e){}
+  }catch(e){
+    try{
+      const old = JSON.parse(localStorage.getItem(PKEY));
+      if(old && Array.isArray(old.F) && old.F.length === BEACHES.length){ pb.data = old; pb.stale = old.ts; }
+    }catch(e2){}
+  }
+  if(pb.data){
+    const h = new Date().getHours();
+    pb.day = 0;
+    if(h <= 14) pb.slot = "manana"; else if(h <= 19) pb.slot = "tarde"; else { pb.slot = "manana"; pb.day = 1; }
+  }
+  renderBeaches();
+}
+
+function beachDates(){
+  const seen = [];
+  pb.data.F[0].hourly.time.forEach(t => { const d = t.slice(0,10); if(!seen.includes(d)) seen.push(d); });
+  return seen;
+}
+function inSlot(t, date, S){
+  if(!t.startsWith(date)) return false;
+  const hh = +t.slice(11,13);
+  return hh >= S.from && hh <= S.to;
+}
+function computeBeach(i, date, slot){
+  const b = BEACHES[i], S = SLOTS[slot], sh = SHELTER[b.abrigo], hf = pb.data.F[i].hourly;
+  const ix = [];
+  hf.time.forEach((t,k) => { if(inSlot(t, date, S)) ix.push(k); });
+  const col = name => ix.map(k => hf[name] ? hf[name][k] : null).filter(v => v != null);
+  const pairs = ix.filter(k => hf.wind_speed_10m[k] != null && hf.wind_direction_10m[k] != null)
+                  .map(k => [hf.wind_speed_10m[k], hf.wind_direction_10m[k]]);
+  if(!pairs.length) return null;
+  const wind = mean(pairs.map(p => p[0])), dir = vecDir(pairs);
+  const gu = col("wind_gusts_10m"), gust = gu.length ? Math.max(...gu) : wind;
+  const te = col("temperature_2m"), pr = col("precipitation"), uv = col("uv_index");
+  let wave = null;
+  const mh = pb.data.M && pb.data.M[i] && pb.data.M[i].hourly;
+  if(mh && mh.wave_height){
+    const w = [];
+    mh.time.forEach((t,k) => { if(inSlot(t, date, S) && mh.wave_height[k] != null) w.push(mh.wave_height[k]); });
+    if(w.length) wave = mean(w);
+  }
+  const rel = angDiff(dir, b.face);
+  const kind = rel <= 60 ? "mar" : rel <= 120 ? "lateral" : "tierra";
+  const dirF = kind === "mar" ? 1 : kind === "lateral" ? 0.85 : 0.7;
+  const effW = wind*sh.wind*dirF, effG = gust*sh.wind*dirF, effV = wave == null ? 0 : wave*sh.wave;
+  let score = 100 - Math.min(55, effW*2.2) - Math.min(25, Math.max(0, effG-30)*0.8) - Math.min(30, Math.max(0, effV-0.5)*20);
+  score = Math.max(0, Math.round(score));
+  return {b, wind, dir, gust, wave, kind, score,
+          temp: te.length ? mean(te) : null,
+          rain: pr.reduce((x,y)=>x+y, 0),
+          uv: uv.length ? Math.max(...uv) : null,
+          terral: kind === "tierra" && wind >= 12};
+}
+function beachDayLabel(d, i){
+  if(i === 0) return "Hoy";
+  if(i === 1) return "Mañana";
+  return new Date(d+"T12:00:00").toLocaleDateString("es-ES",{weekday:"short"}).replace(".","");
+}
+
+function renderBeaches(){
+  if(!pb.data){
+    pv.innerHTML = '<div class="hero"><h2>No se pudieron cargar las playas</h2><p class="feels">Comprueba tu conexión e inténtalo de nuevo.</p><div><button class="btn primary" id="pretry" type="button">Reintentar</button></div></div>';
+    return;
+  }
+  const dates = beachDates();
+  if(pb.day >= dates.length) pb.day = 0;
+  const date = dates[pb.day], S = SLOTS[pb.slot];
+  const rows = BEACHES.map((b,i) => computeBeach(i, date, pb.slot)).filter(Boolean).sort((a,b) => b.score - a.score);
+
+  const dayChips = dates.map((d,i) => `<button class="chip" type="button" data-day="${i}" aria-pressed="${i===pb.day}">${esc(beachDayLabel(d,i))}</button>`).join("");
+  const slotChips = Object.keys(SLOTS).map(k => `<button class="chip" type="button" data-slot="${k}" aria-pressed="${k===pb.slot}">${SLOTS[k].label} ${SLOTS[k].text}</button>`).join("");
+  let html = `<div class="pctl"><div class="chips" aria-label="Día">${dayChips}</div><div class="chips" aria-label="Franja horaria">${slotChips}</div></div>`;
+
+  if(pb.stale){
+    const mins = Math.max(1, Math.round((Date.now()-pb.stale)/60000));
+    const ago = mins < 60 ? mins+" min" : mins < 1440 ? Math.round(mins/60)+" h" : Math.round(mins/1440)+" d";
+    html += '<p class="offline" role="status">Sin conexión. Datos guardados hace '+ago+'.</p>';
+  }
+  if(date === dates[0] && S.to < new Date().getHours()){
+    html += '<p class="offline" role="status">Esta franja de hoy ya ha pasado.</p>';
+  }
+
+  if(!rows.length){
+    html += '<div class="verdict"><h2>Sin datos para esta franja</h2><p>Prueba con otro día u otra franja horaria.</p></div>';
+  }else{
+    const best = rows[0];
+    const bn = best.b.name+" ("+best.b.town+")";
+    const title = best.score >= 65 ? "Mejor opción: "+bn
+      : best.score >= 40 ? "Ninguna destaca. La menos incómoda: "+bn
+      : "Día complicado para ir con niños a la playa";
+    const rainAvg = mean(rows.map(r => r.rain));
+    let sub = best.score < 40 ? "La mejor opción sería "+bn+", pero también hay viento fuerte o mar movido allí. " : "";
+    sub += "Viento "+r(best.wind)+" km/h del "+dirText(best.dir)+", rachas de hasta "+r(best.gust)+" km/h"+(best.wave!=null ? ", oleaje de "+f1(best.wave)+" m" : "")+".";
+    if(rainAvg >= 0.5) sub += " Se espera lluvia en la franja.";
+    html += `<div class="verdict"><h2>${esc(title)}</h2><p>${esc(sub)}</p></div>`;
+
+    const items = rows.map((x,n) => {
+      const sh = SHELTER[x.b.abrigo], open = pb.open === x.b.id;
+      const waveTxt = x.wave != null ? " · Oleaje "+f1(x.wave)+" m" : "";
+      const tags = `<span class="tag">${sh.text}</span><span class="tag">${KIND[x.kind]}</span>`
+        + (x.terral ? '<span class="tag alert">Atención: viento de tierra, cuidado con flotadores y colchonetas</span>' : "")
+        + (x.rain >= 0.5 ? '<span class="tag">Lluvia '+f1(x.rain)+' mm</span>' : "");
+      const detail = `<p class="bnote">${esc(x.b.note)}</p><div class="hgrid">${[
+        stat("Temperatura", x.temp != null ? r(x.temp)+"°" : null),
+        stat("Lluvia", f1(x.rain)+" mm"),
+        stat("UV máx.", x.uv != null ? f1(x.uv) : null, x.uv != null ? uvWord(x.uv) : ""),
+        stat("Viento", r(x.wind)+" km/h "+dirText(x.dir), KIND[x.kind]),
+        stat("Rachas", r(x.gust)+" km/h"),
+        stat("Oleaje", x.wave != null ? f1(x.wave)+" m" : null, x.wave != null ? "Mar abierto" : "Sin datos")
+      ].join("")}</div>`;
+      return `<li class="bch"><button class="bh" type="button" data-id="${x.b.id}" aria-expanded="${open}" aria-controls="bd-${x.b.id}">
+        <span class="rk num">${n+1}</span>
+        <span class="bn"><b>${esc(x.b.name)}</b><small>${esc(x.b.town)} · ${x.b.zone}</small></span>
+        <span class="bs"><b class="num">${x.score}</b><small>${scoreLabel(x.score)}</small></span>
+        <span class="bbar"><i style="width:${x.score}%;background:${scoreColor(x.score)}"></i></span>
+        <span class="bline num">Viento del ${dirText(x.dir)} ${r(x.wind)} km/h · Rachas ${r(x.gust)}${waveTxt}</span>
+        <span class="btags">${tags}</span></button>
+        <div class="bd" id="bd-${x.b.id}"${open ? "" : " hidden"}>${detail}</div></li>`;
+    }).join("");
+    html += `<section class="box"><h2>Playas, de más a menos cómoda</h2><ul class="blist">${items}</ul></section>`;
+  }
+
+  html += `<div class="pfoot">
+    <details class="more"><summary>Cómo se calcula</summary>
+      <p>La nota va de 0 a 100 y mide la comodidad en la arena con niños. Resta puntos por viento medio, rachas y oleaje de la franja elegida. El viento pesa menos en playas abrigadas, y el de tierra pesa menos que el del mar. El abrigo de cada playa es una estimación basada en las guías de turismo, y se supone que todas miran más o menos al norte. Los datos meteorológicos son de modelos con celdas de varios kilómetros, así que no recogen el resguardo de un acantilado concreto.</p>
+    </details>
+    <p>Las mareas cambian mucho estas playas. Antes de ir, consulta las horas de pleamar y bajamar, y vigila siempre a los niños junto al agua.</p>
+    <p>Descripciones de playas basadas en <a href="https://www.turismoasturias.es/es/-/blogs/las-mejores-playas-para-ir-con-ninos-en-asturias" target="_blank" rel="noopener">Turismo Asturias</a> y <a href="https://asturias.com/playas-para-ninos-en-asturias/" target="_blank" rel="noopener">asturias.com</a>. Oleaje de Open-Meteo Marine.</p>
+  </div>`;
+  pv.innerHTML = html;
+}
+
+pv.addEventListener("click", e => {
+  const day = e.target.closest("[data-day]"), slot = e.target.closest("[data-slot]"), row = e.target.closest(".bh[data-id]");
+  if(e.target.closest("#pretry")){ pb.started = false; initBeaches(); return; }
+  if(day){ pb.day = +day.dataset.day; renderBeaches(); }
+  else if(slot){ pb.slot = slot.dataset.slot; renderBeaches(); }
+  else if(row){ pb.open = (pb.open === row.dataset.id) ? null : row.dataset.id; renderBeaches(); }
+});
+
+/* ---------- Pestañas ---------- */
+const tabT = $("tab-tiempo"), tabP = $("tab-playas"), viewT = $("view-tiempo");
+function showTab(name){
+  const pl = name === "playas";
+  (pl ? tabT : tabP).removeAttribute("aria-current");
+  (pl ? tabP : tabT).setAttribute("aria-current","page");
+  viewT.hidden = pl; pv.hidden = !pl;
+  try{ history.replaceState(null, "", pl ? "#playas" : location.pathname + location.search); }catch(e){}
+  if(pl) initBeaches();
+}
+tabT.addEventListener("click", () => showTab("tiempo"));
+tabP.addEventListener("click", () => showTab("playas"));
+
 loadForecast(defaultCity);
 if(getMode() === "gps") locate(true);
+if(location.hash === "#playas") showTab("playas");
 
 /* ---------- App instalable: service worker ---------- */
 if("serviceWorker" in navigator && location.protocol.indexOf("http")===0){
