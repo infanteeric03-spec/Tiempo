@@ -97,6 +97,19 @@ h1,h2{font-family:var(--font-display);margin:0;font-weight:700;text-wrap:balance
 .verdict{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px;display:flex;flex-direction:column;gap:6px}
 .verdict h2{font-size:1.15rem}
 .verdict p{margin:0;color:var(--muted)}
+.tide{padding:0 16px;display:flex;flex-direction:column;gap:6px}
+.tsvg{display:block;width:100%;max-width:560px;height:auto;touch-action:pan-y;cursor:crosshair}
+.tsvg:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+.tsvg text{font-family:var(--font-body);font-size:10px;fill:var(--muted);font-variant-numeric:tabular-nums}
+.tsvg text.tl{font-size:11px;font-weight:600;fill:var(--fg)}
+.tread{min-height:1.4em;font-size:.9rem;color:var(--muted)}
+.tread b{color:var(--fg);font-weight:600}
+.tev{list-style:none;margin:10px 0 0;padding:0 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.tev li{background:var(--surface-2);border-radius:10px;padding:8px 10px;min-width:0}
+.tev span{display:block;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+.tev b{font-size:1.05rem;font-weight:600}
+.tev small{color:var(--muted);font-size:.8rem}
+.tsum{margin:10px 0 0;padding:0 16px;color:var(--muted);font-size:.85rem}
 .blist{list-style:none;margin:0;padding:0 16px}
 .bch{border-top:1px solid var(--line)}
 .bch:first-child{border-top:0}
@@ -534,25 +547,32 @@ const BEACHES = [
   {id:"frejulfe", name:"Frejulfe", town:"Navia", zone:"Occidente", lat:43.565, lon:-6.665, face:0, abrigo:"bajo",
    note:"Playa abierta, a veces con oleaje fuerte. Los más pequeños pueden chapotear en el río, en el extremo este."},
   {id:"banugues", name:"Bañugues", town:"Gozón", zone:"Centro", lat:43.609, lon:-5.820, face:0, abrigo:"alto",
-   note:"Ensenada apacible con muy poco oleaje. Poco fondo y charcas naturales en bajamar."},
+   note:"Ensenada apacible con muy poco oleaje. Poco fondo y charcas naturales en bajamar.",
+   tide:"bajamar", tideWhy:"en bajamar se forman charcas naturales."},
   {id:"sanlorenzo", name:"San Lorenzo", town:"Gijón", zone:"Centro", lat:43.545, lon:-5.660, face:0, abrigo:"medio",
    note:"Playa urbana, muy larga y con todos los servicios. Mira al norte, algo resguardada por Cimadevilla."},
   {id:"poniente", name:"Poniente", town:"Gijón", zone:"Centro", lat:43.543, lon:-5.683, face:0, abrigo:"medio",
-   note:"Playa artificial de unos 500 m con dique al este. Tiene mucha más arena en bajamar que en pleamar."},
+   note:"Playa artificial de unos 500 m con dique al este. Tiene mucha más arena en bajamar que en pleamar.",
+   tide:"bajamar", tideWhy:"en bajamar tiene unos 140.000 m² de arena frente a unos 60.000 en pleamar."},
   {id:"rodiles", name:"Rodiles", town:"Villaviciosa", zone:"Centro", lat:43.527, lon:-5.385, face:0, abrigo:"bajo",
    note:"La playa abierta tiene olas. Para bañarse con calma, mejor la zona de la ría (Misiego y la «playita de Miami»)."},
   {id:"lagriega", name:"La Griega", town:"Colunga", zone:"Centro", lat:43.499, lon:-5.268, face:0, abrigo:"medio",
-   note:"Poca agua en la orilla y charcas en bajamar. Un río desemboca en la propia playa."},
+   note:"Poca agua en la orilla y charcas en bajamar. Un río desemboca en la propia playa.",
+   tide:"bajamar", tideWhy:"en bajamar queda poca agua en la orilla y se forman charcas."},
   {id:"santamarina", name:"Santa Marina", town:"Ribadesella", zone:"Oriente", lat:43.468, lon:-5.057, face:0, abrigo:"medio",
-   note:"Playa urbana con todos los servicios. Con mar picada hay una zona de baño en el extremo este."},
+   note:"Playa urbana con todos los servicios. Con mar picada hay una zona de baño en el extremo este.",
+   tide:"bajamar", tideWhy:"en bajamar la arena se ensancha y se puede explorar la zona rocosa del oeste."},
   {id:"guadamia", name:"Guadamía", town:"Llanes", zone:"Oriente", lat:43.447, lon:-4.937, face:0, abrigo:"alto",
-   note:"Un canal estrecho entre acantilados la protege del mar. Banco de arena largo en bajamar."},
+   note:"Un canal estrecho entre acantilados la protege del mar. Banco de arena largo en bajamar.",
+   tide:"bajamar", tideWhy:"en bajamar aparece un banco de arena largo para jugar."},
   {id:"barro", name:"Barro", town:"Llanes", zone:"Oriente", lat:43.445, lon:-4.815, face:0, abrigo:"alto",
    note:"Bahía en herradura protegida por islotes, al abrigo del viento y del mar abierto."},
   {id:"poo", name:"Poo", town:"Llanes", zone:"Oriente", lat:43.431, lon:-4.779, face:0, abrigo:"alto",
-   note:"Ensenada de aguas muy tranquilas; en pleamar parece una piscina de agua salada. Arena fina y sin desniveles bruscos."},
+   note:"Ensenada de aguas muy tranquilas; en pleamar parece una piscina de agua salada. Arena fina y sin desniveles bruscos.",
+   tide:"pleamar", tideWhy:"en pleamar el agua queda tranquila, como una piscina de agua salada."},
   {id:"lafranca", name:"La Franca", town:"Ribadedeva", zone:"Oriente", lat:43.398, lon:-4.535, face:0, abrigo:"medio",
-   note:"En la desembocadura del río Cabra. En pleamar queda una piscina somera; oleaje moderado."}
+   note:"En la desembocadura del río Cabra. En pleamar queda una piscina somera; oleaje moderado.",
+   tide:"pleamar", tideWhy:"en pleamar queda una piscina grande y poco profunda. En bajamar hay que tener precaución."}
 ];
 const SHELTER = {
   alto:  {wind:0.55, wave:0.5, text:"Abrigada"},
@@ -592,9 +612,11 @@ async function getJson(url){
 async function loadBeaches(){
   const lat = BEACHES.map(b => b.lat).join(","), lon = BEACHES.map(b => b.lon).join(",");
   const tz = "&timezone=Europe%2FMadrid&forecast_days=7";
-  const [f, m] = await Promise.allSettled([
+  const [f, m, tm] = await Promise.allSettled([
     getJson("https://api.open-meteo.com/v1/forecast?latitude="+lat+"&longitude="+lon+"&hourly=temperature_2m,precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index"+tz),
-    getJson("https://marine-api.open-meteo.com/v1/marine?latitude="+lat+"&longitude="+lon+"&hourly=wave_height"+tz)
+    getJson("https://marine-api.open-meteo.com/v1/marine?latitude="+lat+"&longitude="+lon+"&hourly=wave_height"+tz),
+    // Mareas en petición aparte: un día antes y uno después para no perder pleamares en los bordes
+    getJson("https://marine-api.open-meteo.com/v1/marine?latitude="+lat+"&longitude="+lon+"&hourly=sea_level_height_msl&past_days=1&forecast_days=8&timezone=Europe%2FMadrid")
   ]);
   pb.data = null; pb.stale = null;
   try{
@@ -603,7 +625,9 @@ async function loadBeaches(){
     if(F.length !== BEACHES.length) throw new Error("respuesta incompleta");
     let M = null;
     if(m.status === "fulfilled"){ M = [].concat(m.value); if(M.length !== BEACHES.length) M = null; }
-    pb.data = {F, M, ts:Date.now()};
+    let T = null;
+    if(tm.status === "fulfilled"){ T = [].concat(tm.value); if(T.length !== BEACHES.length) T = null; }
+    pb.data = {F, M, T, ts:Date.now()};
     try{ localStorage.setItem(PKEY, JSON.stringify(pb.data)); }catch(e){}
   }catch(e){
     try{
@@ -612,6 +636,7 @@ async function loadBeaches(){
     }catch(e2){}
   }
   if(pb.data){
+    buildTides();
     const h = new Date().getHours();
     pb.day = 0;
     if(h <= 14) pb.slot = "manana"; else if(h <= 19) pb.slot = "tarde"; else { pb.slot = "manana"; pb.day = 1; }
@@ -665,6 +690,164 @@ function beachDayLabel(d, i){
   return new Date(d+"T12:00:00").toLocaleDateString("es-ES",{weekday:"short"}).replace(".","");
 }
 
+/* ---- Mareas ---- */
+const capTide = t => t === "pleamar" ? "Pleamar" : "Bajamar";
+const fmtH = h => (h >= 0 ? "+" : "−") + f1(Math.abs(h)) + " m";
+function longDay(date, i){
+  if(i === 0) return "de hoy";
+  if(i === 1) return "de mañana";
+  return "del " + new Date(date+"T12:00:00").toLocaleDateString("es-ES",{weekday:"long", day:"numeric"});
+}
+function seriesOf(i){
+  const t = pb.data && pb.data.T && pb.data.T[i];
+  return t && t.hourly && t.hourly.sea_level_height_msl && t.hourly.time ? t.hourly : null;
+}
+// Pleamares y bajamares de una serie horaria de nivel del mar: máximos y mínimos locales,
+// afinados con una parábola para no quedar atados a la hora en punto.
+function tideEvents(time, v){
+  const ev = [], w = 3;
+  for(let k = w; k < v.length - w; k++){
+    if(v[k] == null) continue;
+    let mx = true, mn = true;
+    for(let j = 1; j <= w && (mx || mn); j++){
+      const a = v[k-j], b = v[k+j];
+      if(a == null || b == null){ mx = mn = false; break; }
+      if(!(v[k] >= a && v[k] > b)) mx = false;
+      if(!(v[k] <= a && v[k] < b)) mn = false;
+    }
+    if(!mx && !mn) continue;
+    const y0 = v[k-1], y1 = v[k], y2 = v[k+1], den = y0 - 2*y1 + y2;
+    let off = 0, hgt = y1;
+    if(den !== 0){
+      off = 0.5*(y0 - y2)/den;
+      if(off > 0.5 || off < -0.5) off = 0; else hgt = y1 - 0.25*(y0 - y2)*off;
+    }
+    const base = Date.parse(time[k]+":00Z");
+    const step = off >= 0 ? Date.parse(time[k+1]+":00Z") - base : base - Date.parse(time[k-1]+":00Z");
+    const ms = Math.round((base + off*step)/300000)*300000;     // a múltiplos de 5 minutos
+    const iso = new Date(ms).toISOString();
+    ev.push({type: mx ? "pleamar" : "bajamar", ms, date: iso.slice(0,10), hhmm: iso.slice(11,16), h: hgt});
+  }
+  return ev;
+}
+function buildTides(){
+  pb.ev = BEACHES.map((b,i) => { const s = seriesOf(i); return s ? tideEvents(s.time, s.sea_level_height_msl) : []; });
+  // Si a una playa le faltan datos, usa los de la playa con datos más cercana
+  pb.src = BEACHES.map((b,i) => {
+    if(pb.ev[i].length) return i;
+    let best = -1, bd = Infinity;
+    BEACHES.forEach((o,j) => {
+      if(!pb.ev[j].length) return;
+      const d = Math.hypot(o.lat - b.lat, (o.lon - b.lon)*0.73);
+      if(d < bd){ bd = d; best = j; }
+    });
+    return best;
+  });
+}
+function dayEvents(i, date){
+  const s = pb.src ? pb.src[i] : -1;
+  return (s != null && s >= 0) ? pb.ev[s].filter(e => e.date === date) : [];
+}
+function evInSlot(evs, date, S){
+  const d0 = Date.parse(date+"T00:00:00Z");
+  return evs.filter(e => e.ms >= d0 + S.from*36e5 && e.ms < d0 + (S.to+1)*36e5);
+}
+
+// Curva de marea del día (una sola serie): línea de 2 px, área tenue, extremos etiquetados y franja elegida sombreada.
+function tideChart(ref, date){
+  pb.tc = null;
+  const s = pb.src ? pb.src[ref] : -1;
+  if(s == null || s < 0) return "";
+  const hs = seriesOf(s); if(!hs) return "";
+  const v = hs.sea_level_height_msl, pts = [];
+  hs.time.forEach((t,k) => { if(t.startsWith(date) && v[k] != null) pts.push({hr:+t.slice(11,13), v:v[k]}); });
+  const nxt = new Date(Date.parse(date+"T00:00:00Z") + 864e5).toISOString().slice(0,10);
+  const kn = hs.time.indexOf(nxt+"T00:00");
+  if(kn >= 0 && v[kn] != null) pts.push({hr:24, v:v[kn]});
+  if(pts.length < 20) return "";
+  const evs = pb.ev[s].filter(e => e.date === date);
+  const W = 320, H = 130, pL = 10, pR = 10, pT = 26, pB = 36, pw = W-pL-pR, ph = H-pT-pB;
+  let lo = Math.min(...pts.map(p => p.v), ...evs.map(e => e.h)), hi = Math.max(...pts.map(p => p.v), ...evs.map(e => e.h));
+  if(hi - lo < 0.5){ lo -= 0.25; hi += 0.25; }
+  const xs = hr => pL + hr/24*pw, ys = val => pT + (hi - val)/(hi - lo)*ph;
+  const n1 = n => n.toFixed(1), S = SLOTS[pb.slot];
+  const line = pts.map((p,k) => (k ? "L" : "M") + n1(xs(p.hr)) + " " + n1(ys(p.v))).join(" ");
+  const area = line + " L" + n1(xs(pts[pts.length-1].hr)) + " " + (H-pB) + " L" + n1(xs(pts[0].hr)) + " " + (H-pB) + " Z";
+  const band = `<rect x="${n1(xs(S.from))}" y="${pT}" width="${n1(xs(Math.min(24, S.to+1)) - xs(S.from))}" height="${ph}" fill="var(--bar)" opacity=".35"/>`;
+  const grid = [6,12,18].map(hr => `<line x1="${n1(xs(hr))}" y1="${pT}" x2="${n1(xs(hr))}" y2="${H-pB}" stroke="var(--line)" stroke-width="1"/>`).join("")
+    + `<line x1="${pL}" y1="${H-pB}" x2="${W-pR}" y2="${H-pB}" stroke="var(--line)" stroke-width="1"/>`;
+  const ticks = [0,6,12,18,24].map(hr => `<text x="${n1(xs(hr))}" y="${H-6}" text-anchor="${hr === 0 ? "start" : hr === 24 ? "end" : "middle"}">${hr} h</text>`).join("");
+  const marks = evs.map(e => {
+    const hr = (e.ms - Date.parse(date+"T00:00:00Z"))/36e5, x = xs(Math.max(0, Math.min(24, hr))), y = ys(e.h);
+    const anchor = x < 26 ? "start" : x > W-26 ? "end" : "middle", up = e.type === "pleamar";
+    return `<circle cx="${n1(x)}" cy="${n1(y)}" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>`
+         + `<text class="tl" x="${n1(x)}" y="${n1(up ? y-9 : y+17)}" text-anchor="${anchor}">${e.hhmm}</text>`;
+  }).join("");
+  const label = "Curva de marea. " + (evs.length ? evs.map(e => capTide(e.type)+" a las "+e.hhmm).join(", ") + "." : "");
+  pb.tc = {pts, W, pL, pw, xs, ys};
+  return `<svg id="tsvg" class="tsvg" viewBox="0 0 ${W} ${H}" role="img" tabindex="0" aria-label="${esc(label)}">`
+    + band + grid + `<path d="${area}" fill="var(--accent)" opacity=".1"/>`
+    + `<path d="${line}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`
+    + marks + ticks
+    + `<line id="tcross" x1="0" x2="0" y1="${pT}" y2="${H-pB}" stroke="var(--muted)" stroke-width="1" visibility="hidden"/>`
+    + `<circle id="tdot" r="4" cx="0" cy="0" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" visibility="hidden"/>`
+    + `</svg>`;
+}
+function tideCard(date){
+  const ref = BEACHES.findIndex(b => b.id === "sanlorenzo");
+  const evs = dayEvents(ref, date), ch = tideChart(ref, date);
+  if(!evs.length && !ch){
+    return '<section class="box"><h2>Mareas</h2><p class="tsum">No hay datos de mareas ahora mismo. Consulta una tabla de mareas antes de ir.</p></section>';
+  }
+  const rb = BEACHES[pb.src[ref]];
+  const lis = evs.map(e => `<li><span>${capTide(e.type)}</span><b class="num">${e.hhmm}</b> <small class="num">${fmtH(e.h)}</small></li>`).join("");
+  const hv = evs.map(e => e.h);
+  let sum = "";
+  if(hv.length >= 2){
+    const rg = Math.max(...hv) - Math.min(...hv);
+    sum = "Oscilación del día: " + f1(rg) + " m (" + (rg < 2.2 ? "mareas pequeñas" : rg < 3.4 ? "mareas moderadas" : "mareas grandes") + ").";
+  }
+  return `<section class="box"><h2>Mareas ${longDay(date, pb.day)}</h2>
+    <p class="hint">Referencia: ${esc(rb.name)} (${esc(rb.town)}). Horas aproximadas y alturas sobre el nivel medio del mar. La franja elegida aparece sombreada.</p>
+    ${ch ? `<div class="tide">${ch}<div id="tread" class="tread" aria-live="polite">Toca la curva para ver la altura a cada hora.</div></div>` : ""}
+    <ul class="tev">${lis}</ul>${sum ? `<p class="tsum">${sum}</p>` : ""}</section>`;
+}
+function wireTide(){
+  const svg = $("tsvg"), tc = pb.tc;
+  if(!svg || !tc) return;
+  const cross = svg.querySelector("#tcross"), dot = svg.querySelector("#tdot"), out = $("tread"), def = out.textContent;
+  let cur = 12;
+  function show(hr){
+    cur = hr;
+    const p = tc.pts.find(q => q.hr === hr); if(!p) return;
+    const x = tc.xs(hr), y = tc.ys(p.v);
+    cross.setAttribute("x1", x); cross.setAttribute("x2", x); cross.setAttribute("visibility", "visible");
+    dot.setAttribute("cx", x); dot.setAttribute("cy", y); dot.setAttribute("visibility", "visible");
+    const a = tc.pts.find(q => q.hr === hr-1), b = tc.pts.find(q => q.hr === hr+1);
+    const trend = (a && b) ? (b.v > a.v ? " · subiendo" : " · bajando") : "";
+    const strong = document.createElement("b");
+    strong.textContent = fmtH(p.v);
+    out.textContent = "";
+    out.append(strong, " a las " + String(hr).padStart(2,"0") + ":00" + trend);
+  }
+  function hide(){
+    cross.setAttribute("visibility", "hidden"); dot.setAttribute("visibility", "hidden"); out.textContent = def;
+  }
+  function hourAt(e){
+    const r = svg.getBoundingClientRect(), px = (e.clientX - r.left)/r.width*tc.W;
+    return Math.max(0, Math.min(23, Math.round((px - tc.pL)/tc.pw*24)));
+  }
+  svg.addEventListener("pointermove", e => show(hourAt(e)));
+  svg.addEventListener("pointerdown", e => show(hourAt(e)));
+  svg.addEventListener("pointerleave", e => { if(e.pointerType !== "touch") hide(); });
+  svg.addEventListener("focus", () => show(cur));
+  svg.addEventListener("blur", hide);
+  svg.addEventListener("keydown", e => {
+    if(e.key === "ArrowLeft"){ e.preventDefault(); show(Math.max(0, cur-1)); }
+    else if(e.key === "ArrowRight"){ e.preventDefault(); show(Math.min(23, cur+1)); }
+  });
+}
+
 function renderBeaches(){
   if(!pb.data){
     pv.innerHTML = '<div class="hero"><h2>No se pudieron cargar las playas</h2><p class="feels">Comprueba tu conexión e inténtalo de nuevo.</p><div><button class="btn primary" id="pretry" type="button">Reintentar</button></div></div>';
@@ -701,14 +884,24 @@ function renderBeaches(){
     sub += "Viento "+r(best.wind)+" km/h del "+dirText(best.dir)+", rachas de hasta "+r(best.gust)+" km/h"+(best.wave!=null ? ", oleaje de "+f1(best.wave)+" m" : "")+".";
     if(rainAvg >= 0.5) sub += " Se espera lluvia en la franja.";
     html += `<div class="verdict"><h2>${esc(title)}</h2><p>${esc(sub)}</p></div>`;
+    html += tideCard(date);
 
     const items = rows.map((x,n) => {
       const sh = SHELTER[x.b.abrigo], open = pb.open === x.b.id;
       const waveTxt = x.wave != null ? " · Oleaje "+f1(x.wave)+" m" : "";
+      const bi = BEACHES.indexOf(x.b), tevs = dayEvents(bi, date);
+      const fit = x.b.tide ? evInSlot(tevs, date, S).find(e => e.type === x.b.tide) : null;
       const tags = `<span class="tag">${sh.text}</span><span class="tag">${KIND[x.kind]}</span>`
         + (x.terral ? '<span class="tag alert">Atención: viento de tierra, cuidado con flotadores y colchonetas</span>' : "")
-        + (x.rain >= 0.5 ? '<span class="tag">Lluvia '+f1(x.rain)+' mm</span>' : "");
-      const detail = `<p class="bnote">${esc(x.b.note)}</p><div class="hgrid">${[
+        + (x.rain >= 0.5 ? '<span class="tag">Lluvia '+f1(x.rain)+' mm</span>' : "")
+        + (fit ? '<span class="tag">'+capTide(fit.type)+' en tu franja ('+fit.hhmm+')</span>' : "");
+      const borrowed = pb.src && pb.src[bi] >= 0 && pb.src[bi] !== bi;
+      const tideNote = (tevs.length
+          ? "Mareas "+longDay(date, pb.day)+": "+tevs.map(e => capTide(e.type)+" "+e.hhmm).join(" · ")+"."
+            + (borrowed ? " Estimadas a partir de "+BEACHES[pb.src[bi]].name+", la playa con datos más cercana." : "")
+          : "")
+        + (x.b.tide ? (tevs.length ? " " : "")+"Esta playa va mejor con "+x.b.tide+": "+x.b.tideWhy : "");
+      const detail = `<p class="bnote">${esc(x.b.note)}</p>${tideNote ? `<p class="bnote">${esc(tideNote)}</p>` : ""}<div class="hgrid">${[
         stat("Temperatura", x.temp != null ? r(x.temp)+"°" : null),
         stat("Lluvia", f1(x.rain)+" mm"),
         stat("UV máx.", x.uv != null ? f1(x.uv) : null, x.uv != null ? uvWord(x.uv) : ""),
@@ -730,12 +923,13 @@ function renderBeaches(){
 
   html += `<div class="pfoot">
     <details class="more"><summary>Cómo se calcula</summary>
-      <p>La nota va de 0 a 100 y mide la comodidad en la arena con niños. Resta puntos por viento medio, rachas y oleaje de la franja elegida. El viento pesa menos en playas abrigadas, y el de tierra pesa menos que el del mar. El abrigo de cada playa es una estimación basada en las guías de turismo, y se supone que todas miran más o menos al norte. Los datos meteorológicos son de modelos con celdas de varios kilómetros, así que no recogen el resguardo de un acantilado concreto.</p>
+      <p>La nota va de 0 a 100 y mide la comodidad en la arena con niños. Resta puntos por viento medio, rachas y oleaje de la franja elegida. El viento pesa menos en playas abrigadas, y el de tierra pesa menos que el del mar. Las mareas no cambian la nota; se muestran aparte porque cada playa va mejor con una marea distinta. El abrigo de cada playa es una estimación basada en las guías de turismo, y se supone que todas miran más o menos al norte. Los datos meteorológicos son de modelos con celdas de varios kilómetros, así que no recogen el resguardo de un acantilado concreto.</p>
     </details>
-    <p>Las mareas cambian mucho estas playas. Antes de ir, consulta las horas de pleamar y bajamar, y vigila siempre a los niños junto al agua.</p>
-    <p>Descripciones de playas basadas en <a href="https://www.turismoasturias.es/es/-/blogs/las-mejores-playas-para-ir-con-ninos-en-asturias" target="_blank" rel="noopener">Turismo Asturias</a> y <a href="https://asturias.com/playas-para-ninos-en-asturias/" target="_blank" rel="noopener">asturias.com</a>. Oleaje de Open-Meteo Marine.</p>
+    <p>Las horas de marea son una estimación de un modelo y pueden variar media hora o más. Antes de ir, contrástalas con una tabla de mareas, por ejemplo la de <a href="https://es.windfinder.com/tide/gijon_este" target="_blank" rel="noopener">Gijón en Windfinder</a>. Las mareas cambian mucho estas playas: vigila siempre a los niños junto al agua.</p>
+    <p>Descripciones de playas basadas en <a href="https://www.turismoasturias.es/es/-/blogs/las-mejores-playas-para-ir-con-ninos-en-asturias" target="_blank" rel="noopener">Turismo Asturias</a> y <a href="https://asturias.com/playas-para-ninos-en-asturias/" target="_blank" rel="noopener">asturias.com</a>. Oleaje y mareas de Open-Meteo Marine.</p>
   </div>`;
   pv.innerHTML = html;
+  wireTide();
 }
 
 pv.addEventListener("click", e => {
