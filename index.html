@@ -109,6 +109,14 @@ h1,h2{font-family:var(--font-display);margin:0;font-weight:700;text-wrap:balance
 .tev span{display:block;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
 .tev b{font-size:1.05rem;font-weight:600}
 .tev small{color:var(--muted);font-size:.8rem}
+.tcard summary{list-style:none;cursor:pointer;display:flex;align-items:center;flex-wrap:wrap;gap:2px 10px;padding:0 16px;margin-bottom:10px;border-radius:12px}
+.tcard summary::-webkit-details-marker{display:none}
+.tcard summary::after{content:"";margin-left:auto;width:8px;height:8px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg);transition:transform .15s}
+.tcard details[open] summary::after{transform:rotate(-135deg)}
+section.box.tcard summary h2{padding-inline:0;margin:0}
+.tcard summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tsub{flex-basis:100%;order:3;color:var(--muted);font-size:.8rem}
+.tcard details[open] .tsub{display:none}
 .tsum{margin:10px 0 0;padding:0 16px;color:var(--muted);font-size:.85rem}
 .blist{list-style:none;margin:0;padding:0 16px}
 .bch{border-top:1px solid var(--line)}
@@ -585,7 +593,8 @@ const SLOTS = {
 };
 const PKEY = "tiempo.playas";
 const pv = $("view-playas");
-let pb = {data:null, day:0, slot:"tarde", open:null, started:false, stale:null};
+let pb = {data:null, day:0, slot:"tarde", open:null, started:false, stale:null, tideOpen:true};
+try{ if(localStorage.getItem("tiempo.mareas") === "0") pb.tideOpen = false; }catch(e){}
 
 const mean = a => a.length ? a.reduce((x,y)=>x+y,0)/a.length : null;
 const angDiff = (a,b) => Math.abs(((a-b+540)%360)-180);
@@ -807,10 +816,11 @@ function tideCard(date){
     const rg = Math.max(...hv) - Math.min(...hv);
     sum = "Oscilación del día: " + f1(rg) + " m (" + (rg < 2.2 ? "mareas pequeñas" : rg < 3.4 ? "mareas moderadas" : "mareas grandes") + ").";
   }
-  return `<section class="box"><h2>Mareas ${longDay(date, pb.day)}</h2>
+  const resumen = evs.map(e => (e.type === "pleamar" ? "Pleamar " : "Bajamar ") + e.hhmm).join(" · ");
+  return `<section class="box tcard"><details${pb.tideOpen ? " open" : ""} id="tdet"><summary><h2>Mareas ${longDay(date, pb.day)}</h2>${resumen ? `<small class="tsub num">${resumen}</small>` : ""}</summary>
     <p class="hint">Referencia: ${esc(rb.name)} (${esc(rb.town)}). Horas aproximadas y alturas sobre el nivel medio del mar. La franja elegida aparece sombreada.</p>
     ${ch ? `<div class="tide">${ch}<div id="tread" class="tread" aria-live="polite">Toca la curva para ver la altura a cada hora.</div></div>` : ""}
-    <ul class="tev">${lis}</ul>${sum ? `<p class="tsum">${sum}</p>` : ""}</section>`;
+    <ul class="tev">${lis}</ul>${sum ? `<p class="tsum">${sum}</p>` : ""}</details></section>`;
 }
 function wireTide(){
   const svg = $("tsvg"), tc = pb.tc;
@@ -929,6 +939,8 @@ function renderBeaches(){
     <p>Descripciones de playas basadas en <a href="https://www.turismoasturias.es/es/-/blogs/las-mejores-playas-para-ir-con-ninos-en-asturias" target="_blank" rel="noopener">Turismo Asturias</a> y <a href="https://asturias.com/playas-para-ninos-en-asturias/" target="_blank" rel="noopener">asturias.com</a>. Oleaje y mareas de Open-Meteo Marine.</p>
   </div>`;
   pv.innerHTML = html;
+  const td = $("tdet");
+  if(td) td.ontoggle = () => { pb.tideOpen = td.open; try{ localStorage.setItem("tiempo.mareas", td.open ? "1" : "0"); }catch(e){} };
   wireTide();
 }
 
