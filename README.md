@@ -8,7 +8,7 @@ Web app de previsión del tiempo en un solo archivo (`index.html`), sin dependen
 - Ciudad predeterminada (Oviedo por defecto), que se guarda en el navegador con el botón "Hacer predeterminada".
 - Botón de ubicación para ver el tiempo donde estás, y opción "Abrir siempre con mi ubicación". El navegador pide permiso la primera vez; la ubicación no sale del dispositivo, solo se envían las coordenadas a Open-Meteo y a BigDataCloud para obtener el tiempo y el nombre del lugar.
 - Tiempo actual: temperatura, sensación térmica, viento, humedad, lluvia, UV, amanecer y atardecer.
-- Previsión de las próximas 24 horas.
+- Previsión de las próximas 24 horas. Al tocar una hora se abre su detalle: sensación térmica, lluvia en mm, viento con rachas, humedad, nubosidad, índice UV y un resumen en una frase. En "Más detalles": presión, visibilidad, punto de rocío y nieve.
 - Previsión de 7 días. Al tocar un día se despliega su previsión hora a hora.
 - Diseño adaptado al móvil, con modo claro y oscuro automático.
 

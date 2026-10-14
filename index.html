@@ -39,6 +39,7 @@
   color-scheme:dark;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 var(--font-body);padding-inline:16px;padding-block:calc(16px + env(safe-area-inset-top,0px)) calc(40px + env(safe-area-inset-bottom,0px));-webkit-text-size-adjust:100%}
 main{max-width:640px;margin-inline:auto;display:flex;flex-direction:column;gap:16px}
 h1,h2{font-family:var(--font-display);margin:0;font-weight:700;text-wrap:balance}
@@ -73,8 +74,8 @@ h1,h2{font-family:var(--font-display);margin:0;font-weight:700;text-wrap:balance
 .place p{margin:2px 0 0;color:var(--muted)}
 .pin{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:.9rem;font-weight:600;cursor:pointer;border:1px solid var(--line);background:var(--surface-2);color:var(--fg);border-radius:999px;padding:7px 12px}
 .pin[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
-.now{display:flex;align-items:center;gap:16px}
-.now svg{width:84px;height:84px;flex:none}
+.hero .now{display:flex;align-items:center;gap:16px}
+.hero .now svg{width:84px;height:84px;flex:none}
 .temp{font-family:var(--font-display);font-size:4.2rem;line-height:1;font-weight:700;letter-spacing:-.03em}
 .desc{font-weight:600}
 .feels{color:var(--muted);font-size:.95rem}
@@ -87,13 +88,27 @@ h1,h2{font-family:var(--font-display);margin:0;font-weight:700;text-wrap:balance
 section.box{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:16px 0 12px}
 section.box h2{font-size:1.05rem;padding-inline:16px;margin-bottom:10px}
 .hours{position:relative;display:flex;gap:4px;overflow-x:auto;padding:0 16px 6px;scroll-snap-type:x proximity}
-.hour{flex:none;width:64px;text-align:center;padding:10px 4px;border-radius:12px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:4px}
+.hour{flex:none;width:64px;text-align:center;padding:10px 4px;border-radius:12px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:4px;font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .hour.now{background:var(--surface-2)}
 .hour.past{opacity:.45}
 .hour .t{font-size:.85rem;color:var(--muted)}
 .hour svg{width:30px;height:30px}
 .hour .d{font-weight:600}
 .hour .p{font-size:.78rem;color:var(--rain);min-height:1.1em}
+.hour:hover{background:var(--surface-2)}
+.hour[aria-pressed="true"]{background:var(--surface-2);box-shadow:inset 0 0 0 2px var(--accent)}
+.hour:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.hpanel{margin:8px 16px 4px;padding:14px;border-radius:14px;background:var(--surface-2);display:flex;flex-direction:column;gap:10px}
+.day-detail .hpanel{margin-inline:0}
+.hp-head{font-weight:600;text-transform:capitalize}
+.hp-sum{margin:0}
+.hgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.hs{min-width:0;background:var(--surface);border-radius:10px;padding:8px 10px}
+.hs span{display:block;color:var(--muted);font-size:.72rem;text-transform:uppercase;letter-spacing:.06em}
+.hs b{font-weight:600;font-size:1.05rem}
+.hs small{display:block;color:var(--muted);font-size:.78rem}
+.more summary{cursor:pointer;color:var(--accent);font-weight:600;font-size:.9rem;padding:2px 0 8px}
+.more summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
 .days{list-style:none;margin:0;padding:0 16px}
 .day-item{border-top:1px solid var(--line)}
 .day-item:first-child{border-top:0}
@@ -118,7 +133,7 @@ section.box h2{font-size:1.05rem;padding-inline:16px;margin-bottom:10px}
 .loading{color:var(--muted);text-align:center;padding:40px 0}
 @media (max-width:400px){
   .temp{font-size:3.4rem}
-  .now svg{width:68px;height:68px}
+  .hero .now svg{width:68px;height:68px}
   .day{grid-template-columns:3rem 26px 2.3rem 1fr 2.3rem 12px;gap:8px}
 }
 @media (prefers-reduced-motion:no-preference){ .hours{scroll-behavior:smooth} }
@@ -200,6 +215,11 @@ function icon(code,isDay=1){
 const DIRS = ["N","NE","E","SE","S","SO","O","NO"];
 const dirText = d => DIRS[Math.round(d/45)%8];
 const r = n => Math.round(n);
+const g = (arr,k) => (arr && arr[k]!=null) ? arr[k] : null;
+const f1 = n => n.toFixed(1).replace(".",",");
+const uvWord = u => u<3 ? "Bajo" : u<6 ? "Moderado" : u<8 ? "Alto" : u<11 ? "Muy alto" : "Extremo";
+const stat = (label, value, sub) => `<div class="hs"><span>${label}</span><b class="num">${value==null?"—":value}</b>${sub?`<small class="num">${sub}</small>`:""}</div>`;
+let moreOpen = false;
 function placeLine(c){ return [c.admin1, c.country].filter(Boolean).join(", "); }
 function esc(s){ const d=document.createElement("div"); d.textContent=s==null?"":String(s); return d.innerHTML; }
 function dayName(iso,i){ if(i===0) return "Hoy"; return new Date(iso+"T12:00:00").toLocaleDateString("es-ES",{weekday:"short"}).replace(".",""); }
@@ -223,7 +243,7 @@ async function loadForecast(c){
   app.innerHTML = '<p class="loading">Cargando previsión…</p>';
   const url = "https://api.open-meteo.com/v1/forecast?latitude="+c.latitude+"&longitude="+c.longitude
     + "&current=temperature_2m,apparent_temperature,relative_humidity_2m,precipitation,weather_code,wind_speed_10m,wind_direction_10m,is_day"
-    + "&hourly=temperature_2m,precipitation_probability,weather_code,is_day"
+    + "&hourly=temperature_2m,apparent_temperature,precipitation,precipitation_probability,weather_code,is_day,relative_humidity_2m,dew_point_2m,cloud_cover,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index,pressure_msl,visibility,snowfall"
     + "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,sunrise,sunset,uv_index_max"
     + "&timezone=auto&forecast_days=7";
   try{
@@ -256,7 +276,7 @@ function render(c, d){
   let start = h.time.findIndex(t => t.slice(0,13) >= nowKey); if(start<0) start = 0;
   const hourCell = (i, label, cls) => {
     const p = h.precipitation_probability[i];
-    return `<div class="hour ${cls||""}"><span class="t num">${label}</span>${icon(h.weather_code[i],h.is_day[i])}<span class="d num">${r(h.temperature_2m[i])}°</span><span class="p num">${p>=20?p+"%":""}</span></div>`;
+    return `<button type="button" class="hour ${cls||""}" data-k="${i}" aria-pressed="false" aria-label="${label}, ${r(h.temperature_2m[i])} grados, ${esc(info(h.weather_code[i])[0])}"><span class="t num">${label}</span>${icon(h.weather_code[i],h.is_day[i])}<span class="d num">${r(h.temperature_2m[i])}°</span><span class="p num">${p>=20?p+"%":""}</span></button>`;
   };
   let hoursHtml = "";
   for(let i=start;i<Math.min(start+24,h.time.length);i++){
@@ -298,8 +318,8 @@ function render(c, d){
       <div class="stat"><span>Atardecer</span><b class="num">${dl.sunset[0].slice(11,16)}</b></div>
     </div>
   </div>
-  <section class="box"><h2>Próximas 24 horas</h2><div class="hours">${hoursHtml}</div></section>
-  <section class="box"><h2>Próximos 7 días</h2><p class="hint">Toca un día para ver su previsión por horas.</p><ul class="days">${daysHtml}</ul></section>`;
+  <section class="box"><h2>Próximas 24 horas</h2><p class="hint">Toca una hora para ver el detalle.</p><div class="strip"><div class="hours">${hoursHtml}</div><div class="hpanel" hidden></div></div></section>
+  <section class="box"><h2>Próximos 7 días</h2><p class="hint">Toca un día para ver sus horas y una hora para ver el detalle.</p><ul class="days">${daysHtml}</ul></section>`;
 
   function toggleDay(btn){
     const i = +btn.dataset.i, det = $("det-"+i), wasOpen = btn.getAttribute("aria-expanded")==="true";
@@ -312,12 +332,58 @@ function render(c, d){
       cells += hourCell(k, isNow ? "Ahora" : h.time[k].slice(11,13)+"h", isNow ? "now" : (i===0 && k<start ? "past" : ""));
     }
     const mm = dl.precipitation_sum[i];
-    det.innerHTML = `<p class="det-sum num">Amanece ${dl.sunrise[i].slice(11,16)} · Anochece ${dl.sunset[i].slice(11,16)} · Lluvia ${mm.toFixed(1).replace(".",",")} mm</p><div class="hours">${cells}</div>`;
+    det.innerHTML = `<p class="det-sum num">Amanece ${dl.sunrise[i].slice(11,16)} · Anochece ${dl.sunset[i].slice(11,16)} · Lluvia ${mm.toFixed(1).replace(".",",")} mm</p><div class="strip"><div class="hours">${cells}</div><div class="hpanel" hidden></div></div>`;
     det.hidden = false; btn.setAttribute("aria-expanded","true");
     const strip = det.querySelector(".hours"), nowEl = strip.querySelector(".now");
     if(nowEl) strip.scrollLeft = Math.max(0, nowEl.offsetLeft - 8);
   }
   app.querySelectorAll(".day").forEach(btn => btn.onclick = () => toggleDay(btn));
+
+  // Detalle de una hora concreta
+  function hourPanel(k){
+    const temp = g(h.temperature_2m,k), feel = g(h.apparent_temperature,k), code = h.weather_code[k], day = h.is_day[k];
+    const mm = g(h.precipitation,k), pp = g(h.precipitation_probability,k);
+    const ws = g(h.wind_speed_10m,k), wd = g(h.wind_direction_10m,k), gu = g(h.wind_gusts_10m,k);
+    const hum = g(h.relative_humidity_2m,k), cc = g(h.cloud_cover,k), uv = g(h.uv_index,k);
+    const pr = g(h.pressure_msl,k), vis = g(h.visibility,k), dew = g(h.dew_point_2m,k), sn = g(h.snowfall,k);
+    const notes = [];
+    if((mm!=null && mm>=0.1) || (pp!=null && pp>=60)) notes.push("Lleva paraguas.");
+    if(gu!=null && gu>=60) notes.push("Rachas fuertes de "+r(gu)+" km/h.");
+    else if(gu!=null && gu>=40) notes.push("Viento con rachas de "+r(gu)+" km/h.");
+    if(uv!=null && day && uv>=6) notes.push("UV alto: usa protección solar.");
+    if(feel!=null && feel<=5) notes.push("Hace frío, abrígate.");
+    else if(feel!=null && feel>=30) notes.push("Mucho calor: hidrátate.");
+    if(vis!=null && vis<1000) notes.push("Poca visibilidad.");
+    const summary = (info(code)[0] + (temp!=null ? ", "+r(temp)+"°" : "") + ". " + notes.slice(0,2).join(" ")).trim();
+    const weekday = new Date(h.time[k].slice(0,10)+"T12:00:00").toLocaleDateString("es-ES",{weekday:"long"});
+    const main = [
+      stat("Sensación", feel!=null ? r(feel)+"°" : null, temp!=null ? "Real "+r(temp)+"°" : ""),
+      stat("Lluvia", mm!=null ? f1(mm)+" mm" : null, pp!=null ? "Prob. "+pp+"%" : ""),
+      stat("Viento", ws!=null ? r(ws)+" km/h"+(wd!=null ? " "+dirText(wd) : "") : null, gu!=null ? "Rachas "+r(gu)+" km/h" : ""),
+      stat("Humedad", hum!=null ? r(hum)+"%" : null),
+      stat("Nubosidad", cc!=null ? r(cc)+"%" : null),
+      stat("Índice UV", uv!=null ? f1(uv) : null, uv!=null ? uvWord(uv) : "")
+    ].join("");
+    const more = [
+      stat("Presión", pr!=null ? r(pr)+" hPa" : null),
+      stat("Visibilidad", vis!=null ? (vis>=10000 ? r(vis/1000) : f1(vis/1000))+" km" : null),
+      stat("Punto de rocío", dew!=null ? r(dew)+"°" : null),
+      (sn!=null && sn>0) ? stat("Nieve", f1(sn)+" cm") : ""
+    ].join("");
+    return `<div class="hp-head">${esc(weekday)} ${h.time[k].slice(11,16)}</div><p class="hp-sum">${esc(summary)}</p><div class="hgrid">${main}</div><details class="more"${moreOpen?" open":""}><summary>Más detalles</summary><div class="hgrid">${more}</div></details>`;
+  }
+  app.onclick = e => {
+    const cell = e.target.closest(".hour[data-k]"); if(!cell) return;
+    const strip = cell.closest(".strip"), panel = strip.querySelector(".hpanel");
+    const was = cell.getAttribute("aria-pressed")==="true";
+    strip.querySelectorAll(".hour").forEach(b => b.setAttribute("aria-pressed","false"));
+    if(was){ panel.hidden = true; return; }
+    cell.setAttribute("aria-pressed","true");
+    panel.innerHTML = hourPanel(+cell.dataset.k);
+    panel.querySelector("details").ontoggle = ev => { moreOpen = ev.target.open; };
+    panel.hidden = false;
+    panel.scrollIntoView({block:"nearest"});
+  };
 
   $("pin").onclick = () => {
     defaultCity = {name:c.name, admin1:c.admin1||"", country:c.country||"", latitude:c.latitude, longitude:c.longitude};
