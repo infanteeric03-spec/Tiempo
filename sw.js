@@ -1,5 +1,5 @@
 /* Service worker de Tiempo: la app abre sin conexión; los datos del tiempo siempre van a la red. */
-const VERSION = "tiempo-v5";
+const VERSION = "tiempo-v6";
 const SHELL = [
   "./",
   "index.html",
@@ -32,7 +32,7 @@ self.addEventListener("fetch", e => {
   // Archivos de la propia app: red primero (para recibir actualizaciones) y caché si no hay conexión.
   if (url.origin === self.location.origin) {
     e.respondWith(
-      fetch(req)
+      fetch(req, { cache: "no-cache" })
         .then(res => {
           if (res.ok) { const copy = res.clone(); caches.open(VERSION).then(c => c.put(req, copy)); }
           return res;
